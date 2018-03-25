@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static com.wx.autotrade.restful.MD5Util.getString;
+
 public class MD5Util {
 	
 	public static String buildMysignV1(Map<String, String> sArray,
@@ -26,19 +28,7 @@ public class MD5Util {
 	
 	public static String createLinkString(Map<String, String> params) {
 
-		List<String> keys = new ArrayList<String>(params.keySet());
-		Collections.sort(keys);
-		String prestr = "";
-		for (int i = 0; i < keys.size(); i++) {
-			String key = keys.get(i);
-			String value = params.get(key);
-			if (i == keys.size() - 1) {
-				prestr = prestr + key + "=" + value;
-			} else {
-				prestr = prestr + key + "=" + value + "&";
-			}
-		}
-		return prestr;
+        return getString(params);
 	}
 
 	/**

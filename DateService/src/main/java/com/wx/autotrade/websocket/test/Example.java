@@ -21,7 +21,7 @@ public class Example {
 		secretKey = "B0FA4F10E14364A0C7562DDFBBFD432C";
 
 		// 国际站WebSocket地址 注意如果访问国内站 请将 real.okcoin.com 改为 real.okcoin.cn
-		String url = "wss://real.okcoin.com:10440/websocket/okcoinapi";
+		String url = "wss://real.okex.com:10440/websocket/okexapi";
 
 		// 订阅消息处理类,用于处理WebSocket服务返回的消息
 		WebSocketService service = new BuissnesWebSocketServiceImpl();
@@ -34,6 +34,7 @@ public class Example {
 
 		// 添加订阅
 		client.addChannel("ok_sub_spotusd_btc_ticker");
+		client.addChannel("ok_sub_spot_usd_btc_ticker");
 
 		// 删除定订阅
 		// client.removeChannel("ok_sub_spotusd_btc_ticker");
@@ -59,6 +60,6 @@ public class Example {
 		// client.cancelOrder(apiKey, secretKey, "btc_usd", 123L);
 
 		// 获取用户信息
-		// client.getUserInfo(apiKey,secretKey);
+		//client.getUserInfo(apiKey,secretKey);
 	}
 }
