@@ -7,7 +7,7 @@ import com.wx.autotrade.restful.stock.impl.StockRestApi;
 import org.apache.http.HttpException;
 
 
-import com.alibaba.fastjson.JSONObject;
+//import com.alibaba.fastjson.JSONObject;
 
 
 /**
@@ -52,14 +52,14 @@ public class StockClient {
 	    //现货下单交易
 	    String tradeResult = stockPost.trade("btc_usd", "buy", "50", "0.02");
 	    System.out.println(tradeResult);
-	    JSONObject tradeJSV1 = JSONObject.parseObject(tradeResult);
-	    String tradeOrderV1 = tradeJSV1.getString("order_id");
+	    //JSONObject tradeJSV1 = JSONObject.parseObject(tradeResult);
+	  //  String tradeOrderV1 = tradeJSV1.getString("order_id");
 
 	    //现货获取用户订单信息
-            stockPost.order_info("btc_usd", tradeOrderV1);
+            //stockPost.order_info("btc_usd", tradeOrderV1);
 		
 	    //现货撤销订单
-	    stockPost.cancel_order("btc_usd", tradeOrderV1);
+	   // stockPost.cancel_order("btc_usd", tradeOrderV1);
 		
 	    //现货批量下单
 	    stockPost.batch_trade("btc_usd", "buy", "[{price:50, amount:0.02},{price:50, amount:0.03}]");
