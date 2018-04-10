@@ -1,5 +1,7 @@
 package com.wx.autotrade
 
+import java.util.Date
+
 import com.wx.autotrade.entity.Price
 import com.wx.autotrade.mapper.PriceMapper
 import com.wx.autotrade.start.StartWebApplication
@@ -24,15 +26,15 @@ class TestAdd  {
      val price=new Price
      price.setAvgPrice(1)
      price.setClosePrice(1)
-     price.setDate(2)
-     price.setInterval(1)
+     price.setDate(new Date)
+     price.setIntervals(1)
      price.setMaxPrice(1)
      price.setMinPrice(1)
-     price.setId("1")
+     price.setId("2")
      price.setDepth("1")
      price.setName("btc")
-     mapper.insert(price)
-     val data=mapper.getByNameAndTime("1",0l)
+     //mapper.insert(price)
+     val data=mapper.getByNameAndTime("1",new Date)
      data.forEach(println(_))
 
 

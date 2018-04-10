@@ -1,6 +1,7 @@
 package com.wx.autotrade.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Price  implements Serializable {
     String id;
@@ -14,7 +15,7 @@ public class Price  implements Serializable {
     }
 
     String name;//币种名称
-    long date;//时间
+    Date date;//时间
     float maxPrice;//最大价格
     float minPrice;//最小价格
     float avgPrice;//平均价格
@@ -38,7 +39,7 @@ public class Price  implements Serializable {
     }
 
     String depth;//json数组
-    long interval;//间隔，毫秒
+    int intervals;//间隔，毫秒
 
     public Price() {
     }
@@ -51,19 +52,19 @@ public class Price  implements Serializable {
         this.name = name;
     }
 
-    public long getInterval() {
-        return interval;
+    public long getIntervals() {
+        return intervals;
     }
 
-    public void setInterval(long interval) {
-        this.interval = interval;
+    public void setIntervals(int interval) {
+        this.intervals = interval;
     }
 
-    public long getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(long date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
