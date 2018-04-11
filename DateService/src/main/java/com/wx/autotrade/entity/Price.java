@@ -19,9 +19,11 @@ public class Price  implements Serializable {
     float maxPrice;//最大价格
     float minPrice;//最小价格
     float avgPrice;//平均价格
-    float openPrice;
-    float closePrice;
-
+    int vol;
+    float openPrice;//开盘价格
+    float closePrice;//收盘价格
+    String depth;//json数组 交易深度
+    int intervals;//间隔，毫秒
     public float getClosePrice() {
         return closePrice;
     }
@@ -38,8 +40,14 @@ public class Price  implements Serializable {
         this.openPrice = openPrice;
     }
 
-    String depth;//json数组
-    int intervals;//间隔，毫秒
+
+    public int getVol() {
+        return vol;
+    }
+
+    public void setVol(int vol) {
+        this.vol = vol;
+    }
 
     public Price() {
     }
