@@ -10,13 +10,13 @@ class StockClientService {
 
   @Value("${okex.api.rest.url}")
   var url:String= _
-  @Value("${private_key}")
+  @Value("${okex.api.private_key}")
   var privateKey:String= _
   @Value("${okex.api.api_key}")
   var publicKey:String= _
 
 
-  def getClient= new StockRestApi(publicKey,privateKey,url)
+  def getClient= new StockRestApi(url,publicKey,privateKey)
 
 
 

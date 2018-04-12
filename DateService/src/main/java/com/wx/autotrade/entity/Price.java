@@ -49,6 +49,19 @@ public class Price  implements Serializable {
         this.vol = vol;
     }
 
+    public Price(String id, String name, Date date, float maxPrice, float minPrice, float avgPrice, float openPrice, float closePrice, String depth, int intervals) {
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.maxPrice = maxPrice;
+        this.minPrice = minPrice;
+        this.avgPrice = avgPrice;
+        this.openPrice = openPrice;
+        this.closePrice = closePrice;
+        this.depth = depth;
+        this.intervals = intervals;
+    }
+
     public Price() {
     }
 
