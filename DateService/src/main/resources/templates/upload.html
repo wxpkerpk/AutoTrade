@@ -1,7 +1,194 @@
-<form name="punchout_form" method="post"
-      action="https://openapi.alipaydev.com/gateway.do?charset=utf-8&method=alipay.trade.page.pay&sign=M%2BqipNnVtY32fwKYuMPj7S%2FpYuOrVf0Pwwh2rs3TADihnHeH%2BEVhTT5sxPX0uSjkK4TXXcRe5hYagQkTgoKAOW%2BmGGrX8wXmR36Wbu3sv5%2FyLTnmxdmHOncV3fSChahZubblDGRpbz%2BfOZ0IAkj6j6jPHcUmXk1GRDJf%2B5wGlM0bP2DUGphRaH6Md3M5QoIigssIBpqgHarIGr7Wf%2FHDoOVtYKTWHcYRf%2FKGeh1eGf%2F%2Fcod8CYyFK0aO%2BO4vyaDTVPHouXdiM4FJgqQPxDfFkSeaUcpD0vD8cFJzWkcdkjejGvxlwl4Nw5Pn7swfw0MOt%2FyUT2mY8OaxsaUTYhJAvg%3D%3D&return_url=http%3A%2F%2F127.0.0.1%2Falipay.trade.page.pay-JAVA-UTF-8%2Freturn_url.jsp&notify_url=http%3A%2F%2F127.0.0.1%2Falipay.trade.page.pay-JAVA-UTF-8%2Fnotify_url.jsp&version=1.0&app_id=2016080700190999&sign_type=RSA2&timestamp=2017-11-06+22%3A42%3A14&alipay_sdk=alipay-sdk-java-dynamicVersionNo&format=json">
-    <input type="hidden" name="biz_content"
-           value="{&quot;out_trade_no&quot;:&quot;150997648164950875&quot;,&quot;total_amount&quot;:&quot;3.0&quot;,&quot;subject&quot;:&quot;test&quot;,&quot;body&quot;:&quot;&quot;,&quot;timeout_express&quot;:&quot;10m&quot;,&quot;product_code&quot;:&quot;FAST_INSTANT_TRADE_PAY&quot;}">
-    <input type="submit" value="立即支付" style="display:none">
-</form>
-<script>document.forms[0].submit();</script>
+
+//public class HttpUtilManager {
+//    private static String proxyHost="127.0.0.1";
+//    private static int proxyPort=1080;
+//
+//    private static HttpUtilManager instance = new HttpUtilManager();
+//    private static HttpClient client;
+//    private static long startTime = System.currentTimeMillis();
+//    public static PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+//    private static ConnectionKeepAliveStrategy keepAliveStrat = new DefaultConnectionKeepAliveStrategy() {
+//
+//        public long getKeepAliveDuration(
+//                HttpResponse response,
+//                HttpContext context) {
+//            long keepAlive = super.getKeepAliveDuration(response, context);
+//
+//            if (keepAlive == -1) {
+//                keepAlive = 5000;
+//            }
+//            return keepAlive;
+//        }
+//
+//    };
+//
+//    public HttpUtilManager() {
+//        Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory> create()
+    //                .register("http", new MyConnectionSocketFactory())
+    //                .register("https", new MySSLConnectionSocketFactory(SSLContexts.createSystemDefault())).build();
+    //        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg, new FakeDnsResolver());
+    //        CloseableHttpClient httpclient = HttpClients.custom().setConnectionManager(cm).build();
+    //        client=httpclient;
+    //    }
+    //
+    //    public static HttpUtilManager getInstance() {
+    //        return instance;
+    //    }
+    //
+    //    static class FakeDnsResolver implements DnsResolver {
+    //        @Override
+    //        public InetAddress[] resolve(String host) throws UnknownHostException {
+    //            // Return some fake DNS record for every request, we won't be using it
+    //            return new InetAddress[]{InetAddress.getByAddress(new byte[]{1, 1, 1, 1})};
+    //        }
+    //    }
+    //
+    //    static class MyConnectionSocketFactory extends PlainConnectionSocketFactory {
+    //        @Override
+    //        public Socket createSocket(final HttpContext context) throws IOException {
+    //            InetSocketAddress socksaddr = (InetSocketAddress) context.getAttribute("socks.address");
+    //            Proxy proxy = new Proxy(Proxy.Type.SOCKS, socksaddr);
+    //            return new Socket(proxy);
+    //        }
+    //
+    //        @Override
+    //        public Socket connectSocket(int connectTimeout, Socket socket, HttpHost host, InetSocketAddress remoteAddress,
+    //                                    InetSocketAddress localAddress, HttpContext context) throws IOException {
+    //            // Convert address to unresolved
+    //            InetSocketAddress unresolvedRemote = InetSocketAddress
+    //                    .createUnresolved(host.getHostName(), remoteAddress.getPort());
+    //            return super.connectSocket(connectTimeout, socket, host, unresolvedRemote, localAddress, context);
+    //        }
+    //    }
+    //
+    //    static class MySSLConnectionSocketFactory extends SSLConnectionSocketFactory {
+    //
+    //        public MySSLConnectionSocketFactory(final SSLContext sslContext) {
+    //
+    //            super(sslContext, ALLOW_ALL_HOSTNAME_VERIFIER);
+    //        }
+    //
+    //        @Override
+    //        public Socket createSocket(final HttpContext context) throws IOException {
+    //            InetSocketAddress socksaddr = (InetSocketAddress) context.getAttribute("socks.address");
+    //            Proxy proxy = new Proxy(Proxy.Type.SOCKS, socksaddr);
+    //            return new Socket(proxy);
+    //        }
+    //
+    //        @Override
+    //        public Socket connectSocket(int connectTimeout, Socket socket, HttpHost host, InetSocketAddress remoteAddress,
+    //                                    InetSocketAddress localAddress, HttpContext context) throws IOException {
+    //            // Convert address to unresolved
+    //            InetSocketAddress unresolvedRemote = InetSocketAddress
+    //                    .createUnresolved(host.getHostName(), remoteAddress.getPort());
+    //            return super.connectSocket(connectTimeout, socket, host, unresolvedRemote, localAddress, context);
+    //        }
+    //    }
+    //
+    //        public static void IdleConnectionMonitor() {
+    //
+    //            if (System.currentTimeMillis() - startTime > 30000) {
+    //                startTime = System.currentTimeMillis();
+    //                cm.closeExpiredConnections();
+    //                cm.closeIdleConnections(30, TimeUnit.SECONDS);
+    //            }
+    //        }
+    //
+    //        private static RequestConfig requestConfig = RequestConfig.custom()
+    //                .setSocketTimeout(20000)
+    //                .setConnectTimeout(20000)
+    //                .setConnectionRequestTimeout(20000)
+    //                .build();
+    //
+    //
+    //
+    //
+    //        public HttpClient getHttpClient() {
+    //            return client;
+    //        }
+    //
+    //        private HttpPost httpPostMethod(String url) {
+    //            return new HttpPost(url);
+    //        }
+    //
+    //        private HttpRequestBase httpGetMethod(String url) {
+    //            return new HttpGet(url);
+    //        }
+    //
+    //        public String requestHttpGet(String url_prex, String url, String param) throws HttpException, IOException {
+    //
+    //    //        IdleConnectionMonitor();
+    //            InetSocketAddress socksaddr = new InetSocketAddress(proxyHost,proxyPort);
+    //            HttpClientContext context = HttpClientContext.create();
+    //            context.setAttribute("socks.address", socksaddr);
+    //            url = url_prex + url;
+    //            if (param != null && !param.equals("")) {
+    //                if (url.endsWith("?")) {
+    //                    url = url + param;
+    //                } else {
+    //                    url = url + "?" + param;
+    //                }
+    //            }
+    //            HttpRequestBase method = this.httpGetMethod(url);
+    //            method.setConfig(requestConfig);
+    //            HttpResponse response = client.execute(method,context);
+    //            HttpEntity entity = response.getEntity();
+    //            if (entity == null) {
+    //                return "";
+    //            }
+    //            InputStream is = null;
+    //            String responseData = "";
+    //            responseData = getString(entity, is);
+    //            return responseData;
+    //        }
+    //
+    //	private String getString(HttpEntity entity, InputStream is) throws IOException {
+    //		String responseData;
+    //		try{
+    //		    is = entity.getContent();
+    //		    responseData = IOUtils.toString(is, "UTF-8");
+    //		}finally{
+    //			if(is!=null){
+    //			    is.close();
+    //			}
+    //		}
+    //		return responseData;
+    //	}
+    //
+    //	public String requestHttpPost(String url_prex,String url,Map<String,String> params) throws HttpException, IOException{
+    //
+    //		IdleConnectionMonitor();
+    //		url=url_prex+url;
+    //		HttpPost method = this.httpPostMethod(url);
+    //		List<NameValuePair> valuePairs = this.convertMap2PostParams(params);
+        //		UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(valuePairs, Consts.UTF_8);
+        //		method.setEntity(urlEncodedFormEntity);
+        //		method.setConfig(requestConfig);
+        //		HttpResponse response = client.execute(method);
+        //		HttpEntity entity =  response.getEntity();
+        //		if(entity == null){
+        //			return "";
+        //		}
+        //		InputStream is = null;
+        //		String responseData = getString(entity, is);
+        //		return responseData;
+        //
+        //	}
+        //
+        //	private List<NameValuePair> convertMap2PostParams(Map<String,String> params){
+            //		List<String> keys = new ArrayList<String>(params.keySet());
+                //		if(keys.isEmpty()){
+                //			return null;
+                //		}
+                //		int keySize = keys.size();
+                //		List<NameValuePair>  data = new LinkedList<NameValuePair>() ;
+                    //		for(int i=0;i<keySize;i++){
+                    //			String key = keys.get(i);
+                    //			String value = params.get(key);
+                    //			data.add(new BasicNameValuePair(key,value));
+                    //		}
+                    //		return data;
+                    //	}
+                    //
+                    //    }
+
