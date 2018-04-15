@@ -80,6 +80,10 @@ public class StockRestApi implements IStockRestApi {
 	 * 现货 获取历史订单信息，只返回最近七天的信息URL
 	 */
 	private final String ORDER_HISTORY_URL = "/api/v1/order_history.do";
+	/**
+	 * 现货 获取历史订单信息，只返回最近七天的信息URL
+	 */
+	private final String KLINE_URL = "/api/v1/kline.do";
 
 	@Override
 	public String ticker(String symbol) throws HttpException, IOException {
@@ -95,6 +99,14 @@ public class StockRestApi implements IStockRestApi {
 	    return result;
 	}
 
+	public String kline(String symbol,String type,int size,long since) throws HttpException, IOException{
+		HttpUtilManager httpUtil = HttpUtilManager.getInstance();
+
+		StringBuilder stringBuffer=new StringBuilder("");
+		stringBuffer.append("symbol=").append(symbol).append("&").append("type=").append(type).append("&size=").append(size).append("&since=").append(since);
+		String result = httpUtil.requestHttpGet(url_prex, KLINE_URL, stringBuffer.toString());
+		return result;
+	}
 	@Override
 	public String depth(String symbol) throws HttpException, IOException {
 		HttpUtilManager httpUtil = HttpUtilManager.getInstance();
@@ -125,7 +137,7 @@ public class StockRestApi implements IStockRestApi {
 			}
 			param += "since=" + since;
 		}
-		String result = httpUtil.requestHttpGet(url_prex, this.TRADES_URL, param);
+		String result = httpUtil.requestHttpGet(url_prex, this.KLINE_URL, param);
 	    return result;
 	}
 

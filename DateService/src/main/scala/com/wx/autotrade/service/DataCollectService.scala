@@ -1,5 +1,6 @@
 package com.wx.autotrade.service
 
+import java.io.PrintWriter
 import java.util.{Date, UUID}
 
 import akka.actor._
@@ -11,6 +12,7 @@ import com.wx.autotrade.entity.Price
 
 import scala.concurrent.duration._
 import com.wx.autotrade.mapper.PriceMapper
+import com.wx.autotrade.restful.stock.impl.StockRestApi
 import com.wx.autotrade.start.SpringUtils
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
@@ -122,6 +124,29 @@ object DataCollectService {
     import scala.concurrent.ExecutionContext.Implicits.global
     val tick = "tick"
     val cancellable = system.scheduler.schedule( 2 seconds,intervals, act1, tick)
+
+  }
+
+  def main(args: Array[String]): Unit = {
+    var time=System.currentTimeMillis()/1000-(2000*5*60)*5
+
+
+    val url="https://www.okex.com"
+      val publicKey="ef63c6bb-463b-47dc-99d6-b016120fbd7d"
+        val privateKey="6BA2A61B50CFFA00EA8B8F87C3612168"
+    val client=new StockRestApi(url,publicKey,privateKey)
+    val out = new PrintWriter("d:\\testScalaWrite.txt")
+
+    for(i <- 0 to 4){
+      val value=client.kline("eos_usdt","5min",2000,time)
+      time=time+2000* (5 * 60 * 1000)
+      out.print(value)
+
+    }
+    out.close()
+
+
+
 
   }
 
