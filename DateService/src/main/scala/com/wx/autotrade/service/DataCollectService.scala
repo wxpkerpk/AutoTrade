@@ -8,7 +8,7 @@ import akka.actor.{DeadLetter, Props}
 import akka.event.Logging
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import com.wx.autotrade.entity.Price
+import com.wx.autotrade.entity.{Analysis, Kline, Price}
 
 import scala.concurrent.duration._
 import com.wx.autotrade.mapper.PriceMapper
@@ -118,7 +118,7 @@ object DataCollectService {
   val act1 = system.actorOf(Props[DataCollectService], "autoTrade")
   implicit val time = Timeout(5 seconds)
 
-  val filePath="C:\\"
+  val filePath="D:\\"
 
 
   def startCollectData() = {
@@ -131,25 +131,43 @@ object DataCollectService {
   }
 
   def analysisData(len:Int)={
+    implicit val formats = DefaultFormats
+
     coinsType.par.foreach(name=> {
       val source = Source.fromFile(s"$filePath$name.txt")
-       val array=parse(source.mkString).extract[Array[Array[String]]]
+      val array = parse(source.mkString).extract[Array[Array[String]]]
+      val klineArray= array.map{str=>
+        Kline(new Date(str(0).toLong),str(1).toDouble,str(4).toDouble,str(2).toDouble
+        ,str(3).toDouble,str(5).toDouble)
+      }.reverse
+      val analysisArray=klineArray.map{
+        x=>
+          Analysis(x.date,(x.close-x.begin)/x.begin,x.vol)
+      }
+      analysisArray.indices.foreach(index=>{
+        if(index>0) analysisArray(index)=Analysis(analysisArray(index).date,analysisArray(index).dPrice,(analysisArray(index).dVol-analysisArray(index-1).dVol)/analysisArray(index-1).dVol)
+        println(analysisArray(index).date)
+      })
+      analysisArray(0).dVol=0
+      val result=analysisArray
+      result
 
-
-    }
+    })
 
 
     }
 
   def getKlineData()={
-    val intervals=20
+    val intervals=1
+    coinsType ++= Array("btm_usdt")
 
     implicit val formats = DefaultFormats
     val url="https://www.okex.com"
     import java.io.PrintWriter
     val publicKey="ef63c6bb-463b-47dc-99d6-b016120fbd7d"
     val privateKey="6BA2A61B50CFFA00EA8B8F87C3612168"
-    var time=System.currentTimeMillis()/1000-(2000*5*60)*intervals
+    val cost= (2000l * 5 * 60) * intervals * 1000l
+   var time=System.currentTimeMillis()-cost
     val client=new StockRestApi(url,publicKey,privateKey)
     coinsType.par.foreach(name=>{
       val out = new PrintWriter(s"$filePath$name.txt")
@@ -159,7 +177,9 @@ object DataCollectService {
       for(i <- 0 until  intervals){
         val value=client.kline(name,"5min",2000,time)
         val array=parse(value).extract[Array[Array[String]]]
-        time=time+2000* (intervals * 60 )
+        time=time+ ((2000l * 5 * 60)  * 1000l).toLong
+        val date=new Date(time)
+        println(date)
 
         array.foreach(x=>{
           arrays+=x
@@ -177,14 +197,8 @@ object DataCollectService {
   }
 
   def main(args: Array[String]): Unit = {
-    val intervals=20
-    implicit val formats = DefaultFormats
-
-
-    val coin_name=Array("btc_usdt","eos_usdt","btm_usdt")
-    val url="https://www.okex.com"
-      val publicKey="ef63c6bb-463b-47dc-99d6-b016120fbd7d"
-        val privateKey="6BA2A61B50CFFA00EA8B8F87C3612168"
+    getKlineData()
+    analysisData(1)
 
 
 
