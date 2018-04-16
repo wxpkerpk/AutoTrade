@@ -13,6 +13,7 @@ import com.wx.autotrade.entity.Price
 import scala.concurrent.duration._
 import com.wx.autotrade.mapper.PriceMapper
 import com.wx.autotrade.restful.stock.impl.StockRestApi
+import com.wx.autotrade.service.DataCollectService.time
 import com.wx.autotrade.start.SpringUtils
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
@@ -20,6 +21,7 @@ import org.json4s.jackson.JsonMethods._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
+import scala.io.Source
 
 case class Ticker(buy: Double, sell: Double, last: Double, vol: Double) {
   override def equals(obj: scala.Any): Boolean = {
@@ -116,34 +118,76 @@ object DataCollectService {
   val act1 = system.actorOf(Props[DataCollectService], "autoTrade")
   implicit val time = Timeout(5 seconds)
 
+  val filePath="C:\\"
 
 
-  def startCollectData() ={
-    coinsType++=Array("btc_usdt","eos_usdt","btm_usdt")
+  def startCollectData() = {
+    coinsType ++= Array("btc_usdt", "eos_usdt", "btm_usdt")
 
     import scala.concurrent.ExecutionContext.Implicits.global
     val tick = "tick"
-    val cancellable = system.scheduler.schedule( 2 seconds,intervals, act1, tick)
+    val cancellable = system.scheduler.schedule(2 seconds, intervals, act1, tick)
+
+  }
+
+  def analysisData(len:Int)={
+    coinsType.par.foreach(name=> {
+      val source = Source.fromFile(s"$filePath$name.txt")
+       val array=parse(source.mkString).extract[Array[Array[String]]]
+
+
+    }
+
+
+    }
+
+  def getKlineData()={
+    val intervals=20
+
+    implicit val formats = DefaultFormats
+    val url="https://www.okex.com"
+    import java.io.PrintWriter
+    val publicKey="ef63c6bb-463b-47dc-99d6-b016120fbd7d"
+    val privateKey="6BA2A61B50CFFA00EA8B8F87C3612168"
+    var time=System.currentTimeMillis()/1000-(2000*5*60)*intervals
+    val client=new StockRestApi(url,publicKey,privateKey)
+    coinsType.par.foreach(name=>{
+      val out = new PrintWriter(s"$filePath$name.txt")
+
+
+      val arrays=new ArrayBuffer[Array[String]]()
+      for(i <- 0 until  intervals){
+        val value=client.kline(name,"5min",2000,time)
+        val array=parse(value).extract[Array[Array[String]]]
+        time=time+2000* (intervals * 60 )
+
+        array.foreach(x=>{
+          arrays+=x
+        })
+
+      }
+      import org.json4s.native.Serialization.{read, write}
+      out.print(write(a = arrays.toArray))
+      out.close()
+
+
+    })
+
 
   }
 
   def main(args: Array[String]): Unit = {
-    var time=System.currentTimeMillis()/1000-(2000*5*60)*5
+    val intervals=20
+    implicit val formats = DefaultFormats
 
 
+    val coin_name=Array("btc_usdt","eos_usdt","btm_usdt")
     val url="https://www.okex.com"
       val publicKey="ef63c6bb-463b-47dc-99d6-b016120fbd7d"
         val privateKey="6BA2A61B50CFFA00EA8B8F87C3612168"
-    val client=new StockRestApi(url,publicKey,privateKey)
-    val out = new PrintWriter("d:\\testScalaWrite.txt")
 
-    for(i <- 0 to 4){
-      val value=client.kline("eos_usdt","5min",2000,time)
-      time=time+2000* (5 * 60 * 1000)
-      out.print(value)
 
-    }
-    out.close()
+
 
 
 
