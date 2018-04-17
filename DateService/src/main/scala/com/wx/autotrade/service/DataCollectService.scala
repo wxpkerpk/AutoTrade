@@ -17,6 +17,7 @@ import com.wx.autotrade.service.DataCollectService.time
 import com.wx.autotrade.start.SpringUtils
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
+import org.json4s.native.Serialization.write
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -118,7 +119,7 @@ object DataCollectService {
   val act1 = system.actorOf(Props[DataCollectService], "autoTrade")
   implicit val time = Timeout(5 seconds)
 
-  val filePath="C:\\"
+  val filePath="D:\\"
 
 
   def startCollectData() = {
@@ -134,7 +135,7 @@ object DataCollectService {
   def judgePrice(currentPrice:Double,futurePrices:Array[Double])={
 
     val len=futurePrices.count(x => {
-      x > currentPrice * 1.005
+      x > currentPrice * 1.004
     })
     len > 0
   }
@@ -152,14 +153,15 @@ object DataCollectService {
       }
       analysisArray.indices.foreach(index=>{
         if(index>0) analysisArray(index).dVol=(analysisArray(index).dVol-analysisArray(index-1).dVol)/analysisArray(index).dVol
-
-
-
+        if(index<=analysisArray.length-3) analysisArray(index).p= if(judgePrice(array(index).close,Array(array(index+1).close,array(index+2).close))) 1 else 0
           //println(analysisArray(index).date)
       })
       analysisArray(0).dVol=0
-      val result=analysisArray.reverse
-      result
+      val result=analysisArray
+      val out = new PrintWriter(s"$filePath${name}_analysis.txt")
+      out.print(write(a = result))
+      out.close()
+
 
     })
 
