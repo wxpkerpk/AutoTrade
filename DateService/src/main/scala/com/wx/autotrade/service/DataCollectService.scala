@@ -133,8 +133,10 @@ object DataCollectService {
 
   def judgePrice(currentPrice:Double,futurePrices:Array[Double])={
 
-
-
+    val len=futurePrices.count(x => {
+      x > currentPrice * 1.005
+    })
+    len > 0
   }
 
   def analysisData(len:Int)={
