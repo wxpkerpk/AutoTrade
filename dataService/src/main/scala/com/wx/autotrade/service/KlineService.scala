@@ -1,7 +1,6 @@
 package com.wx.autotrade.service
 import java.util.Date
 
-import com.wx.autotrade.entity.Kline
 import com.wx.autotrade.restful.HttpUtilManager
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
@@ -26,18 +25,18 @@ object KlineService{
     var timeNow=System.currentTimeMillis()-length*5l*60l*1000l
     val internals=length/400
     val restCount=length%400
-    val result=new collection.mutable.ArrayBuffer[Kline]()
+    val result=new collection.mutable.ArrayBuffer[com.wx.autotrade.entity.Kline]()
     for(i <-0.until(internals)){
       val array=getKlines(symbol,"5m",timeNow)
      val lines= array.map{
-        lines=>Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
+        lines=>com.wx.autotrade.entity.Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
       }
       result++=lines
       timeNow += (400*5*60*1000l)
     }
     val array=getKlines(symbol,"5m",timeNow)
     val lines= array.map{
-      lines=>Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
+      lines=>com.wx.autotrade.entity.Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
     }
     result++=lines
     result.toArray

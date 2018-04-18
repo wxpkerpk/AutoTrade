@@ -115,11 +115,11 @@ object DataCollectService {
 
   val intervals=3 seconds
   val queueMaxLength=20
-  val system = ActorSystem("autoTrade")
-  val act1 = system.actorOf(Props[DataCollectService], "autoTrade")
+//  val system = ActorSystem("autoTrade")
+  //val act1 = system.actorOf(Props[DataCollectService], "autoTrade")
   implicit val time = Timeout(5 seconds)
 
-  val filePath="D:\\"
+  val filePath="C:\\"
 
 
   def startCollectData() = {
@@ -127,7 +127,7 @@ object DataCollectService {
 
     import scala.concurrent.ExecutionContext.Implicits.global
     val tick = "tick"
-    val cancellable = system.scheduler.schedule(2 seconds, intervals, act1, tick)
+   // val cancellable = system.scheduler.schedule(2 seconds, intervals, act1, tick)
 
   }
 
@@ -135,15 +135,17 @@ object DataCollectService {
   def judgePrice(currentPrice:Double,futurePrices:Array[Double])={
 
     val len=futurePrices.count(x => {
-      x > currentPrice * 1.004
+      x > currentPrice
     })
-    len > 0
+
+    if(len==futurePrices.length && futurePrices(futurePrices.length-1)>currentPrice*1.004) true
+    else false
   }
 
   def analysisData(len:Int)={
     implicit val formats = DefaultFormats
 
-    coinsType.par.foreach(name=> {
+    coinsType.foreach(name=> {
       val source = Source.fromFile(s"$filePath$name.txt")
       val array = parse(source.mkString).extract[Array[Kline]]
 
@@ -158,9 +160,10 @@ object DataCollectService {
       })
       analysisArray(0).dVol=0
       val result=analysisArray
-      val out = new PrintWriter(s"$filePath${name}_analysis.txt")
-      out.print(write(a = result))
-      out.close()
+      //val out = new PrintWriter(s"$filePath${name}_analysis.txt")
+      //out.print(write(a = result))
+      //out.close()
+      result
 
 
     })
@@ -177,7 +180,7 @@ object DataCollectService {
     coinsType.par.foreach(name=>{
       val out = new PrintWriter(s"$filePath$name.txt")
 
-      val arrays=getKlineBycounts(name,40000)
+      val arrays=getKlineBycounts(name,60000)
       import org.json4s.native.Serialization.{read, write}
       out.print(write(a = arrays.toArray))
       out.close()
@@ -190,7 +193,7 @@ object DataCollectService {
   def main(args: Array[String]): Unit = {
     coinsType ++= Array("BTCUSDT","EOSBTC")
 
-  //  getKlineData()
+     //getKlineData()
     analysisData(1)
 
 
