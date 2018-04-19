@@ -132,31 +132,37 @@ object DataCollectService {
   }
 
 
-  def judgePrice(currentPrice:Double,futurePrices:Array[Double])={
+  def judgeBuyPrice(currentPrice:Double,futurePrices:Array[Double])={
 
     val len=futurePrices.count(x => {
       x > currentPrice
     })
 
-    if(len==futurePrices.length && futurePrices(futurePrices.length-1)>currentPrice*1.004) true
+    if(len==futurePrices.length && futurePrices(futurePrices.length-1)>currentPrice*1.003) true
+    else false
+  }
+  def judgeSellPrice(currentPrice:Double,futurePrices:Array[Double])={
+
+    val len=futurePrices.count(x => {
+      x <= currentPrice
+    })
+
+    if(len==futurePrices.length && futurePrices(futurePrices.length-1)<currentPrice*1.003) true
     else false
   }
 
-  def analysisData(len:Int)={
+  def analysisData(array:Array[Kline])={
     implicit val formats = DefaultFormats
-
-    coinsType.foreach(name=> {
-      val source = Source.fromFile(s"$filePath$name.txt")
-      val array = parse(source.mkString).extract[Array[Kline]]
-
       val analysisArray=array.map{
         x=>
-          Analysis(x.date,(x.close-x.begin)/x.begin,x.vol,(x.min-x.begin)/x.begin,(x.max-x.close)/x.begin,0)
+          Analysis(x.date,(x.close-x.begin)/x.begin,x.vol,(x.min-x.begin)/x.begin,(x.max-x.close)/x.begin,0,0)
       }
       analysisArray.indices.foreach(index=>{
         if(index>0) analysisArray(index).dVol=(analysisArray(index).dVol-analysisArray(index-1).dVol)/analysisArray(index).dVol
-        if(index<=analysisArray.length-3) analysisArray(index).p= if(judgePrice(array(index).close,Array(array(index+1).close,array(index+2).close))) 1 else 0
-          //println(analysisArray(index).date)
+        if(index<=analysisArray.length-3) analysisArray(index).buy= if(judgeBuyPrice(array(index).close,Array(array(index+1).close,array(index+2).close))) 1 else 0
+        if(index<=analysisArray.length-3) analysisArray(index).sell= if(judgeSellPrice(array(index).close,Array(array(index+1).close,array(index+2).close))) 1 else 0
+
+        //println(analysisArray(index).date)
       })
       analysisArray(0).dVol=0
       val result=analysisArray
@@ -166,35 +172,28 @@ object DataCollectService {
       result
 
 
-    })
+
 
 
     }
   import org.json4s.JsonDSL._
 
-  def getKlineData()={
+  def getKlineData(symbol:String,len:Int)={
     import KlineService.getKlineBycounts
     val intervals=1
 
     implicit val formats = DefaultFormats
-    coinsType.par.foreach(name=>{
-      val out = new PrintWriter(s"$filePath$name.txt")
-
-      val arrays=getKlineBycounts(name,60000)
-      import org.json4s.native.Serialization.{read, write}
-      out.print(write(a = arrays.toArray))
-      out.close()
-
-    })
-
-
+      val arrays=getKlineBycounts(symbol,len)
+    arrays
+  }
+  def getCoinAnaysis(symbol:String,len:Int)={
+    val klineArray=getKlineData(symbol,len)
+    val anaysis=analysisData(klineArray)
+    anaysis
   }
 
   def main(args: Array[String]): Unit = {
-    coinsType ++= Array("BTCUSDT","EOSBTC")
 
-     //getKlineData()
-    analysisData(1)
 
 
 
