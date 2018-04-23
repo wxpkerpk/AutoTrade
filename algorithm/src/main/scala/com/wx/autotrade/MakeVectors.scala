@@ -4,7 +4,6 @@ import com.wx.autotrade.entity.Analysis
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.feature.Normalizer
 import org.apache.spark.ml.linalg.Vectors
-import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.sql.SparkSession
 
 object MakeVectors{
