@@ -5,7 +5,7 @@
 
 	<groupId>com.wx.autotrade</groupId>
 	<artifactId>dataservice</artifactId>
-	<version>1.0.0</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
 
@@ -114,14 +114,6 @@
         </resources>
 		<plugins>
 
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>1.5.3.RELEASE</version>
-                <configuration>
-                    <fork>true</fork>
-                </configuration>
-            </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

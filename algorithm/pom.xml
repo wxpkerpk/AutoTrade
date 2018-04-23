@@ -17,7 +17,7 @@
     <dependency>
         <groupId>com.wx.autotrade</groupId>
         <artifactId>dataservice</artifactId>
-        <version>1.0.0</version>
+        <version>1.0</version>
     </dependency>
     <dependency>
         <groupId>com.wx.autotrade</groupId>
@@ -52,25 +52,7 @@
     </dependency>
 </dependencies>
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <excludes>
-                    <exclude>bootstrap-test.properties</exclude>
-                    <exclude>bootstrap-dev.properties</exclude>
-                    <exclude>bootstrap-pro.properties</exclude>
-                    <exclude>bootstrap.properties</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>bootstrap.properties</include>
-                </includes>
-            </resource>
-        </resources>
+
         <plugins>
 
 
