@@ -1,6 +1,6 @@
 package com.wx.autotrade.service
 
-import java.io.PrintWriter
+import java.io._
 import java.util.{Date, UUID}
 
 import akka.actor._
@@ -176,14 +176,46 @@ object DataCollectService {
 
 
     }
+
+  def serialize[T](o: T)(path:String) {
+    val bos = new FileOutputStream(path)//基于磁盘文件流的序列化
+    val oos = new ObjectOutputStream(bos)
+    oos.writeObject(o)
+    oos.close()
+  }
+
+
+  /** Deserialize an object using Java serizlization */
+  //  def deserialize[T](bytes: Array[Byte]): T = {
+  //    val bis = new ByteArrayInputStream(bytes)
+  //    val ois = new ObjectInputStream(bis)
+  //    ois.readObject.asInstanceOf[T]
+  //  }
+
+  def deserialize[T](path:String): T = {
+    val bis = new FileInputStream(path)
+    val ois = new ObjectInputStream(bis)
+    ois.readObject.asInstanceOf[T]
+  }
+
   import org.json4s.JsonDSL._
 
   def getKlineData(symbol:String,len:Int)={
     import KlineService.getKlineBycounts
     val intervals=1
-
     implicit val formats = DefaultFormats
-      val arrays=getKlineBycounts(symbol,len)
+    val path=symbol+len
+    val file=new File(path)
+    var arrays:Array[Kline]=null
+
+    if(file.exists()){
+      arrays= deserialize[Array[Kline]](path)
+
+    }else{
+       arrays=getKlineBycounts(symbol,len)
+      serialize(arrays)(path)
+
+    }
     arrays
   }
   def getCoinAnaysis(symbol:String,len:Int)={
