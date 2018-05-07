@@ -18,7 +18,7 @@ object MakeVectors{
       }
       (Vectors.dense(features.toArray),arrayAnalysis(i).buy,arrayAnalysis(i).sell)
     }
-    featuresArray.toSeq
+    featuresArray
   }
 
   def main(args: Array[String]): Unit = {

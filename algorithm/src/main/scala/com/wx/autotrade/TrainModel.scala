@@ -13,44 +13,64 @@ import org.apache.spark.sql.SparkSession
 
 object TrainModel {
 
-  def train(symbol:String,len:Int)={
+  def train(symbol: String, len: Int) = {
     val sc = new SparkContext("local", "svm")
     val spark = SparkSession
       .builder()
       .getOrCreate()
 
     import spark.implicits._
-    val vectors=genVectors(7)(getAnalysis =DataCollectService.getCoinAnaysis)(symbol,len)
+    val vectors = genVectors(6)(getAnalysis = DataCollectService.getCoinAnaysis)(symbol, len)
 
-    val dataSet=spark.createDataFrame(vectors).toDF("feature","buyLabel","sellLabel")
+    val klines=DataCollectService.getKlineData(symbol,len)
+    val dataSet = spark.createDataFrame(vectors).toDF("feature", "buyLabel", "sellLabel")
     //范数p-norm规范化
     val normalizer = new Normalizer()
       .setInputCol("feature")
       .setOutputCol("normFeatures")
-    val vectorNorm=normalizer.transform(dataSet)
-    val vectorLabel=vectorNorm.select("normFeatures","buyLabel","sellLabel").map(row=>{
-      val features=row.getAs[org.apache.spark.ml.linalg.Vector](0)
-      val buyLabel=row.getAs[Double](1)
-      val sellLabel=row.getAs[Double](2)
-      (LabeledPoint.apply(buyLabel,Vectors.dense(features.toArray)),LabeledPoint.apply(sellLabel,Vectors.dense(features.toArray)))
+    val vectorNorm = normalizer.transform(dataSet)
+    val vectorLabel = vectorNorm.select("normFeatures", "buyLabel", "sellLabel").map(row => {
+      val features = row.getAs[org.apache.spark.ml.linalg.Vector](0)
+      val buyLabel = row.getAs[Double](1)
+      val sellLabel = row.getAs[Double](2)
+      (LabeledPoint.apply(buyLabel, Vectors.dense(features.toArray)), LabeledPoint.apply(sellLabel, Vectors.dense(features.toArray)))
     }).rdd
 
-    val featuresVectors=vectorLabel.map(_._1).cache()
-   val buyModel= SVMWithSGD.train(vectorLabel.map(_._1),10000,0.01,0.01,0.98)
-  val result  =buyModel.predict(featuresVectors.map(_.features))
+    val featuresVectors = vectorLabel.map(_._1).cache()
+    val buyModel = SVMWithSGD.train(vectorLabel.map(_._1), 50000, 0.001, 0.01, 0.5)
+    val sellModel=SVMWithSGD.train(vectorLabel.map(_._2), 50000, 0.001, 0.01, 0.5)
+    val resultBuy = buyModel.predict(featuresVectors.map(_.features)).collect()
+    val resultSell = sellModel.predict(featuresVectors.map(_.features)).collect()
+    var haveMoney=true
+    var add=1.0
+    var buyPrice=0.0
+    var sellPrice=0.0
+    resultBuy.indices.foreach(x=>{
+      if(resultBuy(x)!=resultSell(x)){
+        if(resultBuy(x)==1&&haveMoney){
+          buyPrice=klines(x).close
+          haveMoney=false
+        }else if(resultSell(x)==1&& !haveMoney){
+          haveMoney=true
+          sellPrice=klines(x).close
+          add=add*(sellPrice/buyPrice)
 
-    val count=result.count()
-   val rightCount= result.zip(featuresVectors).map(x=>{
-     x._1==x._2.label
-    }).filter(y=>y).count()
+        }
+      }
 
-    println(s"模型准确率为： ${rightCount.toDouble/count.toDouble}")
+    })
+    println(s"收益:$add")
+
+
+
+
+   // println(s"模型准确率为： ${rightCount.toDouble / count.toDouble}")
 
 
   }
 
   def main(args: Array[String]): Unit = {
-    train("BTCUSDT",10000)
+    train("BTCUSDT", 10000)
   }
 
 }

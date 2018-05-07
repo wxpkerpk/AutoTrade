@@ -200,7 +200,7 @@ object DataCollectService {
 
   import org.json4s.JsonDSL._
 
-  def getKlineData(symbol:String,len:Int)={
+  def getKlineData(symbol:String,len:Int,fromCache:Boolean=true)={
     import KlineService.getKlineBycounts
     val intervals=1
     implicit val formats = DefaultFormats
@@ -208,7 +208,7 @@ object DataCollectService {
     val file=new File(path)
     var arrays:Array[Kline]=null
 
-    if(file.exists()){
+    if(file.exists()&&fromCache){
       arrays= deserialize[Array[Kline]](path)
 
     }else{
@@ -219,14 +219,42 @@ object DataCollectService {
     arrays
   }
   def getCoinAnaysis(symbol:String,len:Int)={
-    val klineArray=getKlineData(symbol,len)
+    val klineArray=getKlineData(symbol,len,true)
     val anaysis=analysisData(klineArray)
     anaysis
   }
 
   def main(args: Array[String]): Unit = {
 
+    val klines=getKlineData("NEOUSDT",30000,true)
+    var buyPrice=0.0
+    var sellPrice=0.0
+    var haveMoney=true
+    var add=1.0
+    var i=0
+    var sum=0
+    var makeCount=0d
+      while(i<klines.indices.length){
+        if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin>=0.005&&(klines(i+1).close-klines(i+1).begin)/klines(i+1).begin>=0.005&&haveMoney){
+          buyPrice=(klines(i+1).min+klines(i+1).close)*1.001/2
+          haveMoney=false
+          sum+=1
+        }
+        else if((klines(i).close-klines(i).begin)/klines(i).begin<= -0.001&&i<klines.length-2&& !haveMoney){
 
+          sellPrice=(klines(i+1).begin+klines(i+1).close)*0.998/2
+          haveMoney=true
+          add=add*(sellPrice/buyPrice)
+          makeCount=makeCount + (if(sellPrice>buyPrice) 1d else 0d)
+          println(klines(i).date+" : sell:"+sellPrice+"  buy:"+buyPrice+" +%"+(sellPrice/buyPrice-1)*100)
+
+        }
+        i=i+1
+      }
+
+
+    println(s"收益率：%${(add-1)*100}")
+    println(makeCount/sum.toDouble*100)
 
 
 
