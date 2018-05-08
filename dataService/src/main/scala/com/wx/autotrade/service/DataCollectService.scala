@@ -224,9 +224,17 @@ object DataCollectService {
     anaysis
   }
 
+  def decionPrice(klines:Array[Kline],price:Array[Double],beginIndex:Int)={
+      val len=price.length
+    for(i<- 0 until len) yield {
+
+    }
+
+  }
   def main(args: Array[String]): Unit = {
 
-    val klines=getKlineData("NEOUSDT",30000,true)
+    val symbol="AEBTC"
+    val klines=getKlineData(symbol,1500,true)
     var buyPrice=0.0
     var sellPrice=0.0
     var haveMoney=true
@@ -236,24 +244,25 @@ object DataCollectService {
     var makeCount=0d
       while(i<klines.indices.length){
         if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin>=0.005&&(klines(i+1).close-klines(i+1).begin)/klines(i+1).begin>=0.005&&haveMoney){
-          buyPrice=(klines(i+1).min+klines(i+1).close)*1.001/2
+          buyPrice=(klines(i+1).begin+klines(i+1).begin)*1.003/2
           haveMoney=false
           sum+=1
         }
         else if((klines(i).close-klines(i).begin)/klines(i).begin<= -0.001&&i<klines.length-2&& !haveMoney){
 
-          sellPrice=(klines(i+1).begin+klines(i+1).close)*0.998/2
+          sellPrice=(klines(i+1).begin+klines(i+1).close)*0.999/2
           haveMoney=true
           add=add*(sellPrice/buyPrice)
           makeCount=makeCount + (if(sellPrice>buyPrice) 1d else 0d)
-          println(klines(i).date+" : sell:"+sellPrice+"  buy:"+buyPrice+" +%"+(sellPrice/buyPrice-1)*100)
+          println(klines(i).date+" : sell:"+sellPrice+"  buy:"+buyPrice+" +%"+(sellPrice/buyPrice-1)*(100))
 
         }
         i=i+1
       }
 
+    println(klines(klines.length-1).begin+"    "+klines(0).begin)
 
-    println(s"收益率：%${(add-1)*100}")
+    println(s"币种：$symbol 策略收益率：%${(add-1)*100}  自然涨幅：%${(klines(klines.length-1).begin-klines(100).begin)/klines(0).begin*100}")
     println(makeCount/sum.toDouble*100)
 
 
