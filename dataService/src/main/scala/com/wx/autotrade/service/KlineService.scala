@@ -22,19 +22,19 @@ object KlineService{
   }
 
   def getKlineBycounts(symbol:String,length:Int)={
-    var timeNow=System.currentTimeMillis()-length*5*60l*1000l
-    val internals=length/400
+    var timeNow=System.currentTimeMillis()-length*15*60l*1000l
+    val internals=length/400 -1
     val restCount=length%400
     val result=new collection.mutable.ArrayBuffer[com.wx.autotrade.entity.Kline]()
     for(i <-0.until(internals)){
-      val array=getKlines(symbol,"5m",timeNow)
+      val array=getKlines(symbol,"15m",timeNow)
      val lines= array.map{
         lines=>com.wx.autotrade.entity.Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
       }
       result++=lines
-      timeNow += (400*5*60*1000l)
+      timeNow += (400*15*60*1000l)
     }
-    val array=getKlines(symbol,"5m",timeNow)
+    val array=getKlines(symbol,"15m",timeNow)
     val lines= array.map{
       lines=>com.wx.autotrade.entity.Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
     }

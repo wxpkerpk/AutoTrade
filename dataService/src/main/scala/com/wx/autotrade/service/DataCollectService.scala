@@ -233,8 +233,16 @@ object DataCollectService {
   }
   def main(args: Array[String]): Unit = {
 
-    val symbol="AEBTC"
-    val klines=getKlineData(symbol,1500,true)
+    val symbol="EOSETH"
+    val klines=getKlineData(symbol,2000,true)
+    val print=new PrintWriter("eoseth.csv")
+
+    print.println(Kline.makeHead())
+    klines.foreach(u=>{
+      print.println(u.toString)
+    })
+    print.close()
+
     var buyPrice=0.0
     var sellPrice=0.0
     var haveMoney=true
@@ -243,12 +251,12 @@ object DataCollectService {
     var sum=0
     var makeCount=0d
       while(i<klines.indices.length){
-        if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin>=0.005&&(klines(i+1).close-klines(i+1).begin)/klines(i+1).begin>=0.005&&haveMoney){
-          buyPrice=(klines(i+1).begin+klines(i+1).begin)*1.003/2
+        if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin>=0.006&&(klines(i+1).close-klines(i+1).begin)/klines(i+1).begin>=0.007&&haveMoney){
+          buyPrice=(klines(i+1).close+klines(i+2).begin)*1.001/2
           haveMoney=false
           sum+=1
         }
-        else if((klines(i).close-klines(i).begin)/klines(i).begin<= -0.001&&i<klines.length-2&& !haveMoney){
+        else if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin<= -0.001&& !haveMoney){
 
           sellPrice=(klines(i+1).begin+klines(i+1).close)*0.999/2
           haveMoney=true
