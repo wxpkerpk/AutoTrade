@@ -200,7 +200,7 @@ object DataCollectService {
 
   import org.json4s.JsonDSL._
 
-  def getKlineData(symbol:String,len:Int,fromCache:Boolean=true)={
+  def getKlineData(symbol:String,len:Int,fromCache:Boolean=true,types:Int=5)={
     import KlineService.getKlineBycounts
     val intervals=1
     implicit val formats = DefaultFormats
@@ -212,16 +212,15 @@ object DataCollectService {
       arrays= deserialize[Array[Kline]](path)
 
     }else{
-       arrays=getKlineBycounts(symbol,len)
+       arrays=getKlineBycounts(symbol,len,types=types)
       serialize(arrays)(path)
 
     }
     arrays
   }
-  def getCoinAnaysis(symbol:String,len:Int)={
+  def getCoinAnaysis(symbol:String,len:Int,types:Int=5)={
     val klineArray=getKlineData(symbol,len,true)
-    val anaysis=analysisData(klineArray)
-    anaysis
+    //anaysis
   }
 
   def decionPrice(klines:Array[Kline],price:Array[Double],beginIndex:Int)={
@@ -233,9 +232,17 @@ object DataCollectService {
   }
   def main(args: Array[String]): Unit = {
 
-    val symbol="EOSETH"
-    val klines=getKlineData(symbol,2000,true)
-    val print=new PrintWriter("eoseth.csv")
+    val symbol="EOS"+"BTC"
+    val types=15
+    val len=10000
+    val kline_btc=getKlineData("BTCUSDT",len,false,types =types)
+    val klinesymbol=getKlineData(symbol,len,false,types =types)
+   val klines= klinesymbol.zip(kline_btc).map{case (s,btc)=>{
+      Kline(s.date,s.begin*btc.begin,s.close*btc.close,s.max*btc.max,s.min*btc.min,s.vol)
+    }
+    }
+
+    val print=new PrintWriter(s"C:\\Users\\wx\\Desktop\\coinslstm\\${symbol}_$types.csv")
 
     print.println(Kline.makeHead())
     klines.foreach(u=>{
