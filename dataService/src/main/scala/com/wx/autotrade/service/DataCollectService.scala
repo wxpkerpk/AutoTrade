@@ -233,52 +233,52 @@ object DataCollectService {
   def main(args: Array[String]): Unit = {
 
     val symbol="EOS"+"BTC"
-    val types=15
-    val len=10000
+    val types=5
+    val len=20000
     val kline_btc=getKlineData("BTCUSDT",len,false,types =types)
     val klinesymbol=getKlineData(symbol,len,false,types =types)
    val klines= klinesymbol.zip(kline_btc).map{case (s,btc)=>{
-      Kline(s.date,s.begin*btc.begin,s.close*btc.close,s.max*btc.max,s.min*btc.min,s.vol)
+     (Kline(s.date,s.begin*btc.begin,s.close*btc.close,s.max*btc.max,s.min*btc.min,s.vol),btc.begin,btc.close)
     }
     }
 
     val print=new PrintWriter(s"C:\\Users\\wx\\Desktop\\coinslstm\\${symbol}_$types.csv")
 
-    print.println(Kline.makeHead())
+    print.println(Kline.makeHead()+",btc_begin,btc_close")
     klines.foreach(u=>{
-      print.println(u.toString)
+      print.println(s"${u._1.toString},${u._2},${u._3}")
     })
     print.close()
-
-    var buyPrice=0.0
-    var sellPrice=0.0
-    var haveMoney=true
-    var add=1.0
-    var i=0
-    var sum=0
-    var makeCount=0d
-      while(i<klines.indices.length){
-        if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin>=0.006&&(klines(i+1).close-klines(i+1).begin)/klines(i+1).begin>=0.007&&haveMoney){
-          buyPrice=(klines(i+1).close+klines(i+2).begin)*1.001/2
-          haveMoney=false
-          sum+=1
-        }
-        else if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin<= -0.001&& !haveMoney){
-
-          sellPrice=(klines(i+1).begin+klines(i+1).close)*0.999/2
-          haveMoney=true
-          add=add*(sellPrice/buyPrice)
-          makeCount=makeCount + (if(sellPrice>buyPrice) 1d else 0d)
-          println(klines(i).date+" : sell:"+sellPrice+"  buy:"+buyPrice+" +%"+(sellPrice/buyPrice-1)*(100))
-
-        }
-        i=i+1
-      }
-
-    println(klines(klines.length-1).begin+"    "+klines(0).begin)
-
-    println(s"币种：$symbol 策略收益率：%${(add-1)*100}  自然涨幅：%${(klines(klines.length-1).begin-klines(100).begin)/klines(0).begin*100}")
-    println(makeCount/sum.toDouble*100)
+//
+//    var buyPrice=0.0
+//    var sellPrice=0.0
+//    var haveMoney=true
+//    var add=1.0
+//    var i=0
+//    var sum=0
+//    var makeCount=0d
+//      while(i<klines.indices.length){
+//        if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin>=0.006&&(klines(i+1).close-klines(i+1).begin)/klines(i+1).begin>=0.007&&haveMoney){
+//          buyPrice=(klines(i+1).close+klines(i+2).begin)*1.001/2
+//          haveMoney=false
+//          sum+=1
+//        }
+//        else if(i<klines.length-2&&(klines(i).close-klines(i).begin)/klines(i).begin<= -0.001&& !haveMoney){
+//
+//          sellPrice=(klines(i+1).begin+klines(i+1).close)*0.999/2
+//          haveMoney=true
+//          add=add*(sellPrice/buyPrice)
+//          makeCount=makeCount + (if(sellPrice>buyPrice) 1d else 0d)
+//          println(klines(i).date+" : sell:"+sellPrice+"  buy:"+buyPrice+" +%"+(sellPrice/buyPrice-1)*(100))
+//
+//        }
+//        i=i+1
+//      }
+//
+//    println(klines(klines.length-1).begin+"    "+klines(0).begin)
+//
+//    println(s"币种：$symbol 策略收益率：%${(add-1)*100}  自然涨幅：%${(klines(klines.length-1).begin-klines(100).begin)/klines(0).begin*100}")
+//    println(makeCount/sum.toDouble*100)
 
 
 
