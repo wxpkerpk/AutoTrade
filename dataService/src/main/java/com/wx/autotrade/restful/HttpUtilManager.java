@@ -269,9 +269,9 @@ public class HttpUtilManager {
         }
 
         private static RequestConfig requestConfig = RequestConfig.custom()
-                .setSocketTimeout(20000)
-                .setConnectTimeout(20000)
-                .setConnectionRequestTimeout(20000)
+                .setSocketTimeout(200000)
+                .setConnectTimeout(200000)
+                .setConnectionRequestTimeout(200000)
                 .build();
 
 

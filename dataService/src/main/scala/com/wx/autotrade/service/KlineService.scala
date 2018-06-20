@@ -21,20 +21,28 @@ object KlineService{
     result
   }
 
-  def getKlineBycounts(symbol:String,length:Int,types:Int)={
-    var timeNow=System.currentTimeMillis()-length*types*60l*1000l
-    val internals=length/400 -1
+  def getKlineBycounts(symbol:String,length:Int,types:String,date:Date)={
+    val prefix=types.substring(1,2)
+    val count=types.substring(0,1).toInt
+    val countLen=prefix match {
+      case "m"=>1*count
+      case "h"=>60*count
+
+    }
+    val time=date.getTime
+    var timeNow=time-length*countLen*60l*1000l
+    val internals=length/400
     val restCount=length%400
     val result=new collection.mutable.ArrayBuffer[com.wx.autotrade.entity.Kline]()
     for(i <-0.until(internals)){
-      val array=getKlines(symbol,s"${types}m",timeNow)
+      val array=getKlines(symbol,s"${types}",timeNow)
      val lines= array.map{
         lines=>com.wx.autotrade.entity.Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
       }
       result++=lines
-      timeNow += (400*types*60*1000l)
+      timeNow += (400*countLen*60*1000l)
     }
-    val array=getKlines(symbol,s"${types}m",timeNow)
+    val array=getKlines(symbol,s"${types}",timeNow)
     val lines= array.map{
       lines=>com.wx.autotrade.entity.Kline(new Date(lines(0).toLong),lines(1).toDouble,lines(4).toDouble,lines(2).toDouble,lines(3).toDouble,lines(5).toDouble)
     }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/dataService/Model.iml" filepath="$PROJECT_DIR$/dataService/Model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/algorithm/algorithm.iml" filepath="$PROJECT_DIR$/algorithm/algorithm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/autotrade.iml" filepath="$PROJECT_DIR$/autotrade.iml" />
+      <module fileurl="file://$PROJECT_DIR$/autotrade-parent.iml" filepath="$PROJECT_DIR$/autotrade-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dataService/dataservice.iml" filepath="$PROJECT_DIR$/dataService/dataservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/entity/entity.iml" filepath="$PROJECT_DIR$/entity/entity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DateService/spring-boot-mybatis-annotation.iml" filepath="$PROJECT_DIR$/DateService/spring-boot-mybatis-annotation.iml" />
+    </modules>
+  </component>
+</project>
