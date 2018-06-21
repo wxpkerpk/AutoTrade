@@ -236,21 +236,27 @@ object DataCollectService {
   //" \"date,begin,close,max,min,vol"
   def main(args: Array[String]): Unit = {
 
-    val symbols = Array("ETH", "EOS", "AE")
+    val symbols = Array("BTC","ETH", "EOS", "AE")
     val types = "3m"
-    val len = 10000
+    val len = 20000
     val start = new Date()
     val kline_btc = getKlineData("BTCUSDT", len, false, types = types, start)
     val datas=for (s <- symbols) yield {
 
-      val klinesymbol = getKlineData(s + "BTC", len, false, types = types, start)
-      val klines = klinesymbol.zip(kline_btc).map { case (s, btc) => {
-        Kline(s.date, s.begin * btc.begin, s.close * btc.close, s.max * btc.max, s.min * btc.min, s.vol)
+      s match {
+        case "BTC" => kline_btc
+        case _ => {
+          val klinesymbol = getKlineData(s + "BTC", len, false, types = types, start)
+          val klines = klinesymbol.zip(kline_btc).map { case (s, btc) => {
+            Kline(s.date, s.begin * btc.begin, s.close * btc.close, s.max * btc.max, s.min * btc.min, s.vol)
+          }
+          }
+          klines
+        }
       }
-      }
-      klines
+
     }
-    val print=new PrintWriter(s"C:\\Users\\wx\\Desktop\\Multidimensional-LSTM-BitCoin-Time-Series-master\\${symbols.toString}_$types.csv")
+    val print=new PrintWriter(s"C:\\Users\\wx\\Desktop\\coinslstm\\test_$types.csv")
 
 
     var sm=""
@@ -264,26 +270,12 @@ object DataCollectService {
     datas(0).indices.foreach(i=>{
       var line=""
       val len=datas.length
-      for(j <-(len until len){
-
-        line+=datas(j)(i).toString
+      for(j <- 0 until len){
+        line+=datas(j)(i).toString+","
       }
-
-
-
+      print.println(line.substring(0,line.length-1))
     })
-
-
-    datas
-
-
-
-
-
-
-
-
-
+    print.close()
 
 
 
